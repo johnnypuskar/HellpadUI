@@ -1,9 +1,11 @@
 from kivy.app import App
 from kivy.uix.button import Button
+from kivy.core.window import Window
 
-class MyApp(App):
+class Hellpad(App):
     def build(self):
-        return Button(text="Hello, Touchscreen!")
+        Window.fullscreen = 'auto'
+        return Button(text="Hellpad Test!")
 
 if __name__ == "__main__":
-    MyApp().run()
+    Hellpad().run()
