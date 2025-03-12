@@ -64,7 +64,7 @@ if __name__ == "__main__":
     
     # Configure for embedded display only on Pi
     if IS_RASPBERRY_PI:
-        app.setApplicationAttribute(QtCore.Qt.AA_DisableHighDpiScaling)
+        # app.setApplicationAttribute(QtCore.Qt.AA_DisableHighDpiScaling)
         widget = Hellpad()
         widget.setWindowFlags(QtCore.Qt.FramelessWindowHint)
         widget.showFullScreen()
