@@ -4,9 +4,9 @@ from PySide6 import QtCore, QtWidgets, QtGui
 
 # Platform-specific configuration
 if sys.platform == 'linux':
-    os.environ["QT_QPA_PLATFORM"] = "eglfs"
-    os.environ["QT_QPA_EGLFS_NO_LIBINPUT"] = "1"
-    os.environ["QT_QPA_EGLFS_TSLIB"] = "1"
+    os.environ["QT_QPA_PLATFORM"] = "linuxfb"
+    os.environ["QT_QPA_FB_TSLIB"] = "1"
+    os.environ["QT_QPA_FB_NO_LIBINPUT"] = "1"
     IS_RASPBERRY_PI = True
 else:
     IS_RASPBERRY_PI = False
