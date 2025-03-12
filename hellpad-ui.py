@@ -1,6 +1,6 @@
 import sys
 import os
-from PyQt6 import QtCore, QtWidgets, QtGui
+from PySide6 import QtCore, QtWidgets, QtGui
 
 # Platform-specific configuration
 if sys.platform == 'linux':
@@ -28,8 +28,8 @@ class Hellpad(QtWidgets.QWidget):
 
         for button in self.buttons:
             button.setFont(button_font)
-            button.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding,
-                               QtWidgets.QSizePolicy.Policy.Expanding)
+            button.setSizePolicy(QtWidgets.QSizePolicy.Expanding,
+                               QtWidgets.QSizePolicy.Expanding)
 
         self.layout = QtWidgets.QGridLayout(self)
         
