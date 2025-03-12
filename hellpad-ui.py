@@ -56,7 +56,7 @@ class Hellpad(QtWidgets.QWidget):
         self.setStyleSheet("""
             #Hellpad {
                 background-image: url("hellpad-background.png");
-                padding: 60 40 14 40;
+                padding: 85 54 14 54;
             }
             QPushButton {
                 background-color: rgba(142, 143, 136, 0.3);
