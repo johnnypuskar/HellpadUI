@@ -3,8 +3,12 @@ import sys
 import os
 from PySide6 import QtCore, QtWidgets, QtGui
 
-# Set environment for Pi headless mode
-os.environ["QT_QPA_PLATFORM"] = "eglfs"
+# Platform-specific configuration
+if sys.platform == 'linux':
+    os.environ["QT_QPA_PLATFORM"] = "eglfs"
+    IS_RASPBERRY_PI = True
+else:
+    IS_RASPBERRY_PI = False
 
 class Hellpad(QtWidgets.QWidget):
     def __init__(self):
@@ -57,10 +61,15 @@ class Hellpad(QtWidgets.QWidget):
 if __name__ == "__main__":
     app = QtWidgets.QApplication([])
     
-    app.setApplicationAttribute(QtCore.Qt.AA_DisableHighDpiScaling)
-    
-    widget = Hellpad()
-    widget.setWindowFlags(QtCore.Qt.FramelessWindowHint)
-    widget.showFullScreen()
+    # Configure for embedded display only on Pi
+    if IS_RASPBERRY_PI:
+        app.setApplicationAttribute(QtCore.Qt.AA_DisableHighDpiScaling)
+        widget = Hellpad()
+        widget.setWindowFlags(QtCore.Qt.FramelessWindowHint)
+        widget.showFullScreen()
+    else:
+        widget = Hellpad()
+        widget.resize(480, 320)
+        widget.show()
 
     sys.exit(app.exec())
