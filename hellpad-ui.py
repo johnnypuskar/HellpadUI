@@ -14,6 +14,7 @@ else:
 class Hellpad(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
+        self.setFocusPolicy(QtCore.Qt.NoFocus)
 
         self.button_labels = [
             "✔️", "↑", "❌", "←", "↓", "→"
@@ -30,41 +31,53 @@ class Hellpad(QtWidgets.QWidget):
             button.setFont(button_font)
             button.setSizePolicy(QtWidgets.QSizePolicy.Expanding,
                                QtWidgets.QSizePolicy.Expanding)
+            button.setFocusPolicy(QtCore.Qt.NoFocus)
 
-        self.layout = QtWidgets.QGridLayout(self)
-        
+            
+        self.container = QtWidgets.QFrame(self)
+        self.container.setFixedSize(480, 320)
+        self.container.setObjectName("Hellpad")
+
+        self.layout = QtWidgets.QGridLayout(self.container)
+
         for i, button in enumerate(self.buttons):
             row = i // 3
             col = i % 3
             self.layout.addWidget(button, row, col)
-            
-        self.layout.setSpacing(0)
+        self.layout.setVerticalSpacing(12)
+        self.layout.setHorizontalSpacing(26)
+
         for i in range(3):
             self.layout.setColumnStretch(i, 1)
         for i in range(2):
             self.layout.setRowStretch(i, 1)
-        
+
+        self.setObjectName("Hellpad")
         self.setStyleSheet("""
-            QWidget {
-                background-color: #2b2b3b;
+            #Hellpad {
+                background-image: url("hellpad-background.png");
+                padding: 60 40 14 40;
             }
             QPushButton {
-                background-color: #2b2b3b;
-                border: 1px solid grey;
+                background-color: rgba(142, 143, 136, 0.3);
+                border: 2px solid #d9d68b;
+                border-radius: 4px;
                 color: white;
                 padding: 5px;
             }
             QPushButton:pressed {
-                background-color: #1f1f2b;
+                background-color: rgba(102, 103, 106, 0.5);
             }
         """)
+
+        # After creating all buttons and layouts, clear the tab chain
+        self.setTabOrder(self.buttons[-1], self.buttons[0])
+        self.setFocusProxy(None)
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication([])
     
-    # Configure for embedded display only on Pi
     if IS_RASPBERRY_PI:
-        # app.setApplicationAttribute(QtCore.Qt.AA_DisableHighDpiScaling)
         widget = Hellpad()
         widget.setWindowFlags(QtCore.Qt.FramelessWindowHint)
         widget.showFullScreen()
