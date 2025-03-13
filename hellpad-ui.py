@@ -4,7 +4,9 @@ from PySide6 import QtCore, QtWidgets, QtGui
 
 # Platform-specific configuration
 if sys.platform == 'linux':
-    os.environ["QT_QPA_PLATFORM"] = "linuxfb"
+    os.environ["QT_QPA_PLATFORM"] = "linuxfb:fb=/dev/fb0"
+    os.environ["QT_QPA_EVDEV_TOUCHSCREEN_PARAMETERS"] = "/dev/input/event0:rotate=0"
+    os.environ["QT_QPA_GENERIC_PLUGINS"] = "evdevtouch:/dev/input/event0"
     os.environ["QT_QPA_FB_TSLIB"] = "1"
     os.environ["QT_QPA_FB_NO_LIBINPUT"] = "1"
     IS_RASPBERRY_PI = True
