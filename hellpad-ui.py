@@ -74,10 +74,29 @@ class Hellpad(QtWidgets.QWidget):
             }
         """)
 
+        self.sleepTimer = QtCore.QTimer(self)
+        self.sleepTimer.setInterval(15000)  # 15 seconds
+        self.sleepTimer.setSingleShot(True)
+        self.sleepTimer.timeout.connect(self.sleepScreen)
+        self.sleepTimer.start()
+
         # After creating all buttons and layouts, clear the tab chain
         self.setTabOrder(self.buttons[-1], self.buttons[0])
         self.setFocusProxy(None)
     
+    def sleepScreen(self):
+        with open("/sys/class/backlight/rpi_backlight/bl_power", "w") as f:
+            f.write("1")
+    
+    def wakeScreen(self):
+        with open("/sys/class/backlight/rpi_backlight/bl_power", "w") as f:
+            f.write("0")
+        self.sleepTimer.start()
+    
+    def event(self, event):
+        self.wakeScreen()
+        return super().event(event)
+
     def pressButton(self, button):
         if button.text() == "❌":
             QtWidgets.QApplication.quit()
