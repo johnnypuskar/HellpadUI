@@ -13,10 +13,38 @@ if sys.platform == 'linux':
 else:
     IS_RASPBERRY_PI = False
 
+class Code:
+    def __init__(self):
+        self.code = ""
+    
+    def input(self, value):
+        self.code += value
+    
+    def reset(self):
+        self.code = ""
+
+    def __eq__(self, value):
+        if isinstance(value, Code):
+            return self.code == value.code
+        return self.code == value
+
+class CodeIndex:
+    INDEX = {
+        "UUDDLRLR": lambda: QtWidgets.QApplication.quit()
+    }
+    
+    @staticmethod
+    def handle(code):
+        if code in CodeIndex.INDEX:
+            CodeIndex.INDEX[code]()
+
+
 class Hellpad(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
         self.setFocusPolicy(QtCore.Qt.NoFocus)
+
+        self.code = Code()
 
         self.button_labels = [
             "✔️", "↑", "❌", "←", "↓", "→"
@@ -79,7 +107,18 @@ class Hellpad(QtWidgets.QWidget):
 
     def pressButton(self, button):
         if button.text() == "❌":
-            QtWidgets.QApplication.quit()
+            self.code.reset()
+        elif button.text() == "✔️":
+            CodeIndex.handle(self.code)
+            self.code.reset()
+        elif button.text() == "↑":
+            self.code.input("U")
+        elif button.text() == "↓":
+            self.code.input("D")
+        elif button.text() == "←":
+            self.code.input("L")
+        elif button.text() == "→":
+            self.code.input("R")
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication([])
