@@ -34,7 +34,7 @@ class Hellpad(QtWidgets.QWidget):
             button.setSizePolicy(QtWidgets.QSizePolicy.Expanding,
                                QtWidgets.QSizePolicy.Expanding)
             button.setFocusPolicy(QtCore.Qt.NoFocus)
-            button.checked.connect(lambda: self.pressButton(button))
+            button.clicked.connect(lambda checked, btn=button: self.pressButton(btn))
 
             
         self.container = QtWidgets.QFrame(self)
