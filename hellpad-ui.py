@@ -34,9 +34,9 @@ class CodeIndex:
     }
     
     @staticmethod
-    def handle(code):
-        if code in CodeIndex.INDEX:
-            CodeIndex.INDEX[code]()
+    def handle(code_obj):
+        if code_obj.code in CodeIndex.INDEX:
+            CodeIndex.INDEX[code_obj.code]()
 
 
 class Hellpad(QtWidgets.QWidget):
