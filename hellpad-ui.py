@@ -1,5 +1,6 @@
 import sys
 import os
+import subprocess
 from PySide6 import QtCore, QtWidgets, QtGui
 
 # Platform-specific configuration
@@ -80,6 +81,8 @@ class Hellpad(QtWidgets.QWidget):
     def pressButton(self, button):
         if button.text() == "❌":
             QtWidgets.QApplication.quit()
+        elif button.text() == "✔️":
+            subprocess.call(["xset", "dpms" "0"])
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication([])
