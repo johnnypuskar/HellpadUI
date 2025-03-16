@@ -1,6 +1,7 @@
 import sys
 import os
-from PySide6 import QtCore, QtWidgets, QtGui
+import time
+from PySide6 import QtCore, QtWidgets, QtGui, QtMultimedia
 
 # Platform-specific configuration
 if sys.platform == 'linux':
@@ -50,6 +51,16 @@ class Hellpad(QtWidgets.QWidget):
             "✔️", "↑", "❌", "←", "↓", "→"
         ]
 
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        self.press_sound = QtMultimedia.QSoundEffect()
+        self.press_sound.setSource(QtCore.QUrl.fromLocalFile(os.path.join(current_dir, "audio/press.wav")))
+
+        self.success_sound = QtMultimedia.QSoundEffect()
+        self.success_sound.setSource(QtCore.QUrl.fromLocalFile(os.path.join(current_dir, "audio/success.wav")))
+
+        self.fail_sound = QtMultimedia.QSoundEffect()
+        self.fail_sound.setSource(QtCore.QUrl.fromLocalFile(os.path.join(current_dir, "audio/fail.wav")))
+
         self.buttons = [
             QtWidgets.QPushButton(self.button_labels[i]) for i in range(6)
         ]
@@ -83,22 +94,23 @@ class Hellpad(QtWidgets.QWidget):
         for i in range(2):
             self.layout.setRowStretch(i, 1)
 
+        bg_path = os.path.join(current_dir, "hellpad-background.png").replace("\\", "/")
         self.setObjectName("Hellpad")
-        self.setStyleSheet("""
-            #Hellpad {
-                background-image: url("hellpad-background.png");
+        self.setStyleSheet(f"""
+            #Hellpad {{
+                background-image: url("{bg_path}");
                 padding: 85 54 14 54;
-            }
-            QPushButton {
+            }}
+            QPushButton {{
                 background-color: rgba(142, 143, 136, 0.3);
                 border: 2px solid #d9d68b;
                 border-radius: 4px;
                 color: white;
                 padding: 5px;
-            }
-            QPushButton:pressed {
+            }}
+            QPushButton:pressed {{
                 background-color: rgba(240, 240, 250, 0.8);
-            }
+            }}
         """)
 
         # After creating all buttons and layouts, clear the tab chain
@@ -108,9 +120,15 @@ class Hellpad(QtWidgets.QWidget):
     def pressButton(self, button):
         if button.text() == "❌":
             self.code.reset()
+            self.fail_sound.stop()
+            self.fail_sound.play()
+            return
         elif button.text() == "✔️":
             CodeIndex.handle(self.code)
             self.code.reset()
+            self.success_sound.stop()
+            self.success_sound.play()
+            return
         elif button.text() == "↑":
             self.code.input("U")
         elif button.text() == "↓":
@@ -119,6 +137,8 @@ class Hellpad(QtWidgets.QWidget):
             self.code.input("L")
         elif button.text() == "→":
             self.code.input("R")
+        self.press_sound.stop()
+        self.press_sound.play()
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication([])
