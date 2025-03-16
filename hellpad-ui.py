@@ -34,6 +34,7 @@ class Hellpad(QtWidgets.QWidget):
             button.setSizePolicy(QtWidgets.QSizePolicy.Expanding,
                                QtWidgets.QSizePolicy.Expanding)
             button.setFocusPolicy(QtCore.Qt.NoFocus)
+            button.checked.connect(lambda: self.pressButton(button))
 
             
         self.container = QtWidgets.QFrame(self)
@@ -75,6 +76,10 @@ class Hellpad(QtWidgets.QWidget):
         # After creating all buttons and layouts, clear the tab chain
         self.setTabOrder(self.buttons[-1], self.buttons[0])
         self.setFocusProxy(None)
+    
+    def pressButton(self, button):
+        if button.text() == "❌":
+            QtWidgets.QApplication.quit()
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication([])
