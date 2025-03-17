@@ -120,14 +120,14 @@ class Hellpad(QtWidgets.QWidget):
     def pressButton(self, button):
         if button.text() == "❌":
             self.code.reset()
-            self.fail_sound.stop()
-            self.fail_sound.play()
+            # self.fail_sound.stop()
+            # self.fail_sound.play()
             return
         elif button.text() == "✔️":
             CodeIndex.handle(self.code)
             self.code.reset()
-            self.success_sound.stop()
-            self.success_sound.play()
+            # self.success_sound.stop()
+            # self.success_sound.play()
             return
         elif button.text() == "↑":
             self.code.input("U")
@@ -137,8 +137,8 @@ class Hellpad(QtWidgets.QWidget):
             self.code.input("L")
         elif button.text() == "→":
             self.code.input("R")
-        self.press_sound.stop()
-        self.press_sound.play()
+        # self.press_sound.stop()
+        # self.press_sound.play()
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication([])
