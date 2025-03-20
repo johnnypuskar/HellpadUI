@@ -31,6 +31,12 @@ class Code:
 
 class CodeIndex:
     INDEX = {
+        "DLDUR": "MG-43 MACHINE GUN",
+        "DLRUD": "APW-1 ANTI-MATERIEL RIFLE",
+        "DLDUUL": "M-105 STALWART",
+        "DDLUR": "EAT-17 EXPENDABLE ANTI-TANK",
+        "DLRRL": "GR-8 RECOILLESS RIFLE",
+        "DLUDU": "FLAM-40 FLAMETHROWER",
         "URDDD": "EAGLE 500KG BOMB",
         "UUDDLRLR": quit
     }
@@ -101,7 +107,7 @@ class Hellpad(QtWidgets.QWidget):
         self.code_name = QtWidgets.QLabel(self.container)
         self.code_name.setAlignment(QtCore.Qt.AlignCenter)
         self.code_name.setFixedSize(480, 60)
-        self.code_name.move(0, (320)//2 + 20)  # Center in container
+        self.code_name.move(0, (320)//2 + 10)  # Center in container
         self.code_name.setObjectName("CodeName")
         self.code_name.setFont(QtGui.QFont(font_family, 48))
 
@@ -129,7 +135,7 @@ class Hellpad(QtWidgets.QWidget):
             }}
             #CodeName {{
                 color: #FFFFFF;
-                font-size: 24px;
+                font-size: 20px;
                 font-weight: bold;
             }}
             QPushButton {{
