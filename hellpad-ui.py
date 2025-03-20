@@ -17,7 +17,7 @@ else:
 class Code:
     def __init__(self):
         self.code = ""
-    
+
     def input(self, value):
         self.code += value
     
@@ -31,13 +31,23 @@ class Code:
 
 class CodeIndex:
     INDEX = {
-        "UUDDLRLR": lambda: QtWidgets.QApplication.quit()
+        "URDDD": "EAGLE 500KG BOMB",
+        "UUDDLRLR": quit
     }
     
     @staticmethod
     def handle(code_obj):
         if code_obj.code in CodeIndex.INDEX:
-            CodeIndex.INDEX[code_obj.code]()
+            value = CodeIndex.INDEX[code_obj.code]
+            if callable(value):
+                return value()
+            return value
+        return None
+    
+    @staticmethod
+    def quit():
+        QtWidgets.QApplication.quit()
+        return "QUIT PROGRAM"
 
 
 class Hellpad(QtWidgets.QWidget):
@@ -45,13 +55,22 @@ class Hellpad(QtWidgets.QWidget):
         super().__init__()
         self.setFocusPolicy(QtCore.Qt.NoFocus)
 
-        self.code = Code()
-
-        self.button_labels = [
-            "✔️", "↑", "❌", "←", "↓", "→"
-        ]
+        # Touch handling
+        self.setAttribute(QtCore.Qt.WA_AcceptTouchEvents)
+        self.touch_start_pos = None
+        self.min_swipe_distance = 50
 
         current_dir = os.path.dirname(os.path.abspath(__file__))
+
+        # Font setup
+        text_font = QtGui.QFontDatabase.addApplicationFont(os.path.join(current_dir, "automate.ttf"))
+        if text_font != -1:
+            font_family = QtGui.QFontDatabase.applicationFontFamilies(text_font)[0]
+        else:
+            font_family = "Arial"
+
+        self.code = Code()
+
         self.press_sound = QtMultimedia.QSoundEffect()
         self.press_sound.setSource(QtCore.QUrl.fromLocalFile(os.path.join(current_dir, "audio/press.wav")))
 
@@ -61,38 +80,40 @@ class Hellpad(QtWidgets.QWidget):
         self.fail_sound = QtMultimedia.QSoundEffect()
         self.fail_sound.setSource(QtCore.QUrl.fromLocalFile(os.path.join(current_dir, "audio/fail.wav")))
 
-        self.buttons = [
-            QtWidgets.QPushButton(self.button_labels[i]) for i in range(6)
-        ]
-
-        button_font = QtGui.QFont()
-        button_font.setPointSize(36)
-
-        for button in self.buttons:
-            button.setFont(button_font)
-            button.setSizePolicy(QtWidgets.QSizePolicy.Expanding,
-                               QtWidgets.QSizePolicy.Expanding)
-            button.setFocusPolicy(QtCore.Qt.NoFocus)
-            button.clicked.connect(lambda checked, btn=button: self.pressButton(btn))
-
-            
         self.container = QtWidgets.QFrame(self)
         self.container.setFixedSize(480, 320)
         self.container.setObjectName("Hellpad")
 
-        self.layout = QtWidgets.QGridLayout(self.container)
+        
+        self.arrow_image = QtGui.QPixmap(os.path.join(current_dir, "arrow.png"))
+        self.arrow_image_highlighted = QtGui.QPixmap(os.path.join(current_dir, "arrow-highlighted.png"))
+        self.arrow_size = QtCore.QSize(50, 50)  # Define size for arrows
 
-        for i, button in enumerate(self.buttons):
-            row = i // 3
-            col = i % 3
-            self.layout.addWidget(button, row, col)
-        self.layout.setVerticalSpacing(12)
-        self.layout.setHorizontalSpacing(26)
+        # Create container for arrows instead of text label
+        self.code_display = QtWidgets.QWidget(self.container)
+        self.code_display.setFixedHeight(60)
+        self.code_display.move((480-200)//2, (320-60)//2)  # Initial position
+        self.code_display_layout = QtWidgets.QHBoxLayout(self.code_display)
+        self.code_display_layout.setContentsMargins(0, 0, 0, 0)
+        self.code_display_layout.setSpacing(0)
+        self.code_display_layout.setAlignment(QtCore.Qt.AlignCenter)
 
-        for i in range(3):
-            self.layout.setColumnStretch(i, 1)
-        for i in range(2):
-            self.layout.setRowStretch(i, 1)
+        self.code_name = QtWidgets.QLabel(self.container)
+        self.code_name.setAlignment(QtCore.Qt.AlignCenter)
+        self.code_name.setFixedSize(480, 60)
+        self.code_name.move(0, (320)//2 + 20)  # Center in container
+        self.code_name.setObjectName("CodeName")
+        self.code_name.setFont(QtGui.QFont(font_family, 48))
+
+        self.reset_button = QtWidgets.QPushButton("❌", self.container)
+        self.reset_button.setFixedSize(60, 60)
+        self.reset_button.move(
+            self.container.width() - self.reset_button.width() - 10,
+            self.container.height() - self.reset_button.height() - 30
+        )
+        self.reset_button.setObjectName("ResetButton")
+        self.reset_button.clicked.connect(self.resetCode)
+    
 
         bg_path = os.path.join(current_dir, "hellpad-background.png").replace("\\", "/")
         self.setObjectName("Hellpad")
@@ -101,9 +122,20 @@ class Hellpad(QtWidgets.QWidget):
                 background-image: url("{bg_path}");
                 padding: 85 54 14 54;
             }}
+            #CodeDisplay {{
+                color: #FFFFFF;
+                font-size: 48px;
+                font-weight: bold;
+            }}
+            #CodeName {{
+                color: #FFFFFF;
+                font-size: 24px;
+                font-weight: bold;
+            }}
             QPushButton {{
                 background-color: rgba(142, 143, 136, 0.3);
-                border: 2px solid #d9d68b;
+                border: 2px solid rgba(255, 255, 255, 0.5);
+                font-size: 28px;
                 border-radius: 4px;
                 color: white;
                 padding: 5px;
@@ -113,32 +145,116 @@ class Hellpad(QtWidgets.QWidget):
             }}
         """)
 
-        # After creating all buttons and layouts, clear the tab chain
-        self.setTabOrder(self.buttons[-1], self.buttons[0])
-        self.setFocusProxy(None)
+    def mousePressEvent(self, event):
+        self.touch_start_pos = event.globalPosition().toPoint()
+        return super().mousePressEvent(event)
+    
+    def mouseReleaseEvent(self, event):
+        if self.touch_start_pos is not None:
+            self.handleSwipe(self.touch_start_pos, event.globalPosition().toPoint())
+            self.touch_start_pos = None
+        return super().mouseReleaseEvent(event)
+    
+    def handleSwipe(self, start_pos, end_pos):
+        dx = end_pos.x() - start_pos.x()
+        dy = end_pos.y() - start_pos.y()
+        
+        # Check if the movement is significant enough to be considered a swipe
+        if abs(dx) < self.min_swipe_distance and abs(dy) < self.min_swipe_distance:
+            return
+        
+        # Determine the primary direction of the swipe
+        if abs(dx) > abs(dy):
+            # Horizontal swipe
+            if dx > 0:
+                # Right swipe
+                self.code.input("R")
+                print("Right swipe")
+                # self.press_sound.stop()
+                # self.press_sound.play()
+            else:
+                # Left swipe
+                self.code.input("L")
+                print("Left swipe")
+                # self.press_sound.stop()
+                # self.press_sound.play()
+        else:
+            # Vertical swipe
+            if dy > 0:
+                # Down swipe
+                self.code.input("D")
+                print("Down swipe")
+                # self.press_sound.stop()
+                # self.press_sound.play()
+            else:
+                # Up swipe
+                self.code.input("U")
+                print("Up swipe")
+                # self.press_sound.stop()
+                # self.press_sound.play()
+        
+        result = CodeIndex.handle(self.code)
+        self.setCodeDisplay(self.code.code, result)
+    
+    def resetCode(self):
+        self.code.reset()
+        self.setCodeDisplay(self.code.code)
 
-    def pressButton(self, button):
-        if button.text() == "❌":
-            self.code.reset()
-            # self.fail_sound.stop()
-            # self.fail_sound.play()
-            return
-        elif button.text() == "✔️":
-            CodeIndex.handle(self.code)
-            self.code.reset()
-            # self.success_sound.stop()
-            # self.success_sound.play()
-            return
-        elif button.text() == "↑":
-            self.code.input("U")
-        elif button.text() == "↓":
-            self.code.input("D")
-        elif button.text() == "←":
-            self.code.input("L")
-        elif button.text() == "→":
-            self.code.input("R")
-        # self.press_sound.stop()
-        # self.press_sound.play()
+    def setCodeDisplay(self, code, name = None):
+        # Clear existing arrows
+        while self.code_display_layout.count():
+            item = self.code_display_layout.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
+        
+        highlight = False
+        if name is not None:
+            highlight = True
+            self.code_name.setText(name)
+        else:
+            self.code_name.setText("")
+
+        arrow_size = self.arrow_size
+        num_arrows = len(code)
+        arrow_width = self.arrow_size.width()
+        spacing = self.code_display_layout.spacing()
+        total_width = num_arrows * arrow_width + (num_arrows - 1) * spacing if num_arrows > 0 else 200
+        
+        if total_width > 400:
+            arrow_size = QtCore.QSize(400//num_arrows, 400//num_arrows)
+            total_width = 400
+
+        for direction in code:
+            arrow_label = QtWidgets.QLabel()
+            arrow_label.setFixedSize(arrow_size)
+            
+            # Create a copy of the base arrow image
+            if highlight:
+                pixmap = self.arrow_image_highlighted.scaled(arrow_size, 
+                                                             QtCore.Qt.AspectRatioMode.IgnoreAspectRatio, 
+                                                             QtCore.Qt.TransformationMode.SmoothTransformation)
+            else:
+                pixmap = self.arrow_image.scaled(arrow_size, 
+                                                 QtCore.Qt.AspectRatioMode.IgnoreAspectRatio, 
+                                                 QtCore.Qt.TransformationMode.SmoothTransformation)
+                
+            # Apply rotation based on direction
+            transform = QtGui.QTransform()
+            if direction == "R":
+                transform.rotate(90)
+            elif direction == "D":
+                transform.rotate(180)
+            elif direction == "L":
+                transform.rotate(270)
+            
+            rotated_pixmap = pixmap.transformed(transform, QtCore.Qt.SmoothTransformation)
+            arrow_label.setPixmap(rotated_pixmap)
+            self.code_display_layout.addWidget(arrow_label)
+        
+        # Update container width and position to center it
+        self.code_display.setFixedWidth(max(200, total_width))
+        self.code_display.move((480-self.code_display.width())//2, (320-60)//2)
+        
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication([])
