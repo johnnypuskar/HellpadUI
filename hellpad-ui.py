@@ -116,6 +116,7 @@ class Hellpad(QtWidgets.QWidget):
         self.code_name.move(0, (320)//2 + 10)  # Center in container
         self.code_name.setObjectName("CodeName")
         self.code_name.setFont(QtGui.QFont(font_family, 48))
+        self.code_name_text_queue = ""
 
         self.reset_button = QtWidgets.QPushButton("❌", self.container)
         self.reset_button.setFixedSize(85, 70)
@@ -209,6 +210,16 @@ class Hellpad(QtWidgets.QWidget):
         result = CodeIndex.handle(self.code)
         self.setCodeDisplay(self.code.code, result)
     
+    def printText(self, text = ""):
+        self.code_name_text_queue += text
+        self.printNextTextQueueChar()
+
+    def printNextTextQueueChar(self):
+        self.code_name.setText(self.code_name.text() + self.code_name_text_queue[0])
+        self.code_name_text_queue = self.code_name_text_queue[1:]
+        if len(self.code_name_text_queue) > 0:
+            QtCore.QTimer.singleShot(20, self.printNextTextQueueChar)
+
     def resetCode(self):
         self.code.reset()
         self.setCodeDisplay(self.code.code)
@@ -223,7 +234,7 @@ class Hellpad(QtWidgets.QWidget):
         highlight = False
         if name is not None:
             highlight = True
-            self.code_name.setText(name)
+            self.printText(name)
         else:
             self.code_name.setText("")
 
