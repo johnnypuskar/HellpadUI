@@ -38,18 +38,24 @@ class CodeIndex:
         "DLRRL": "GR-8 RECOILLESS RIFLE",
         "DLUDU": "FLAM-40 FLAMETHROWER",
         "URDDD": "EAGLE 500KG BOMB",
+        "RRU": "ORBITAL PRECISION STRIKE",
+        "LDRULDD": "EXO-45 PATRIOT EXOSUIT",
         "UUDDLRLR": quit
     }
     
     @staticmethod
     def handle(code_obj):
-        if code_obj.code in CodeIndex.INDEX:
+        if CodeIndex.is_valid(code_obj.code):
             value = CodeIndex.INDEX[code_obj.code]
             if callable(value):
                 return value()
             return value
         return None
     
+    @staticmethod
+    def is_valid(code):
+        return code in CodeIndex.INDEX
+
     @staticmethod
     def quit():
         QtWidgets.QApplication.quit()
@@ -112,11 +118,12 @@ class Hellpad(QtWidgets.QWidget):
         self.code_name.setFont(QtGui.QFont(font_family, 48))
 
         self.reset_button = QtWidgets.QPushButton("❌", self.container)
-        self.reset_button.setFixedSize(60, 60)
+        self.reset_button.setFixedSize(85, 70)
         self.reset_button.move(
             self.container.width() - self.reset_button.width() - 10,
             self.container.height() - self.reset_button.height() - 30
         )
+        self.reset_button.setFocusPolicy(QtCore.Qt.NoFocus)
         self.reset_button.setObjectName("ResetButton")
         self.reset_button.clicked.connect(self.resetCode)
     
@@ -141,7 +148,7 @@ class Hellpad(QtWidgets.QWidget):
             QPushButton {{
                 background-color: rgba(142, 143, 136, 0.3);
                 border: 2px solid rgba(255, 255, 255, 0.5);
-                font-size: 28px;
+                font-size: 36px;
                 border-radius: 4px;
                 color: white;
                 padding: 5px;
@@ -150,9 +157,13 @@ class Hellpad(QtWidgets.QWidget):
                 background-color: rgba(240, 240, 250, 0.8);
             }}
         """)
+        self.setFocusProxy(None)
 
     def mousePressEvent(self, event):
-        self.touch_start_pos = event.globalPosition().toPoint()
+        if CodeIndex.is_valid(self.code.code):
+            self.resetCode()
+        else:
+            self.touch_start_pos = event.globalPosition().toPoint()
         return super().mousePressEvent(event)
     
     def mouseReleaseEvent(self, event):
