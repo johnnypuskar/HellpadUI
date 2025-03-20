@@ -31,15 +31,85 @@ class Code:
 
 class CodeIndex:
     INDEX = {
-        "DLDUR": "MG-43 MACHINE GUN",
-        "DLRUD": "APW-1 ANTI-MATERIEL RIFLE",
-        "DLDUUL": "M-105 STALWART",
-        "DDLUR": "EAT-17 EXPENDABLE ANTI-TANK",
-        "DLRRL": "GR-8 RECOILLESS RIFLE",
-        "DLUDU": "FLAM-40 FLAMETHROWER",
-        "URDDD": "EAGLE 500KG BOMB",
+        "SASWD": "MG-43 MACHINE GUN",
+        "SADWS": "APW-1 ANTI-MATERIEL RIFLE",
+        "SASWWA": "M-105 STALWART",
+        "SSAWD": "EAT-17 EXPENDABLE ANTI-TANK",
+        "SADDA": "GR-8 RECOILLESS RIFLE",
+        "SAWSA": "FLAM-40 FLAMETHROWER",
+        "SASWWD": "AC-8 AUTOCANNON",
+        "SAWSS": "MG-206 HEAVY MACHINE GUN",
+        "SWWAD": "RL-77 AIRBURST ROCKET LAUNCHER",
+        "SAWSD": "MLS-4X COMMANDO",
+        "SDSWAD": "RS-422 RAILGUN",
+        "SSWSS": "FAF_14 SPEAR",
+        "SSWSD": "StA-X3 W.A.S.P. LAUNCHER",
+        "DSAWW": "ORBITAL GATLING BARRAGE",
+        "DDD": "ORBITAL AIRBURST STRIKE",
+        "DDSADS": "ORBITAL 120MM HE BARRAGE",
+        "DSWWASS": "ORBITAL 380MM HE BARRAGE",
+        "DSDSDS": "ORBITAL WALKING BARRAGE",
+        "DSWDS": "ORBITAL LASER",
+        "DDSADW": "ORBITAL NAPALM BARRAGE",
+        "DWSSD": "ORBITAL RAILCANNON STRIKE",
+        "WDD": "EAGLE STRAFING RUN",
+        "WDSD": "EAGLE AIRSTRIKE",
+        "WDSSD": "EAGLE CLUSTER BOMB",
+        "WDSW": "EAGLE NAPALM AIRSTRIKE",
+        "SWWSW": "LIFT-850 JUMP PACK",
+        "WDWS": "EAGLE SMOKE STRIKE",
+        "WDWA": "EAGLE 110MM ROCKET PODS",
+        "WDSSS": "EAGLE 500KG BOMB",
+        "ASDSDSW": "M-102 FAST RECON VEHICLE",
         "RRU": "ORBITAL PRECISION STRIKE",
-        "LDRULDD": "EXO-45 PATRIOT EXOSUIT",
+        "DDSD": "ORBITAL GAS STRIKE",
+        "DDAS": "ORBITAL EMS STRIKE",
+        "DDSW": "ORBITAL SMOKE STRIKE",
+        "SWADDA": "E/MG-101 HMG EMPLACEMENT",
+        "SSADAD": "FX-12 SHIELD GENERATOR RELAY",
+        "SWDWAD": "A/ARC-3 TESLA TOWER",
+        "SAWD": "MD-6 ANTI-PERSONNEL MINEFIELD",
+        "SASWWS": "B-1 SUPPLY PACK",
+        "SAWAS": "GL-12 GRENADE LAUNCHER",
+        "SASWA": "LAS-98 LASER CANNON",
+        "SAAS": "MD-14 INCENDIARY MINES",
+        "SWASWDD": "AX/LAS-5 \"GUARD DOG\" ROVER",
+        "SASSWA": "SH-20 BALLISTIC SHIELD BACKPACK",
+        "SDSWWA": "ARC-3 ARC THROWER",
+        "SAWW": "MD-17 ANTI-TANK MINES",
+        "SSWAD": "LAS-99 QUASAR CANNON",
+        "SWADAD": "SH-32 SHIELD GENERATOR PACK",
+        "SAAD": "MD-8 GAS MINES",
+        "SWDDW": "A/MG-43 MACHINE GUN SENTRY",
+        "SWDA": "A/G-16 GATLING SENTRY",
+        "SWDDS": "A/M-12 MORTAR SENTRY",
+        "SWAWDS": "AX/AR-23 \"GUARD DOG\"",
+        "SWDWAW": "A/AC-8 AUTOCANNON SENTRY",
+        "SWDDA": "A/MLS-4X ROCKET SENTRY",
+        "SWDSD": "A/M-23 EMS MORTAR SENTRY",
+        "ASDWASS": "EXO-45 PATRIOT EXOSUIT",
+        "ASDWASW": "EXO-49 EMANCIPATOR EXOSUIT",
+        "SAWSA": "TX-41 STERILIZER",
+        "SWAWDW": "AX/TX-13 \"GUARD DOG\" DOG BREATH",
+        "SWADWW": "SH-51 DIRECTIONAL SHIELD",
+        "SWADDD": "E/AT-12 ANTI-TANK EMPLACEMENT",
+        "SWDSWW": "A/FLAM-40 FLAME SENTRY",
+        "SDWWW": "B-100 PORTABLE HELLBOMB",
+        "WSDAW": "REINFORCE",
+        "WSDW": "SOS BEACON",
+        "SSWD": "RESUPPLY",
+        "WWAWD": "EAGLE REARM",
+        "SSSWW": "SSSD DELIVERY",
+        "SSADSS": "PROSPECTING DRILL",
+        "SWSW": "SUPER EARTH FLAG",
+        "SWASWDSW": "HELLBOMB",
+        "ADWWW": "UPLOAD DATA",
+        "WWADSS": "SEISMIC PROBE",
+        "DDAA": "ORBITAL ILLUMINATION FLARE",
+        "DWWS": "SEAF ARTILLERY",
+        "WADSWW": "DARK FLUID VESSEL",
+        "SWSWSW": "TECTONIC DRILL",
+        "AWSDSS": "HIVE BREAKER DRILL",
         "UUDDLRLR": quit
     }
     
@@ -186,24 +256,24 @@ class Hellpad(QtWidgets.QWidget):
             # Horizontal swipe
             if dx > 0:
                 # Right swipe
-                self.code.input("R")
+                self.code.input("D")
                 # self.press_sound.stop()
                 # self.press_sound.play()
             else:
                 # Left swipe
-                self.code.input("L")
+                self.code.input("A")
                 # self.press_sound.stop()
                 # self.press_sound.play()
         else:
             # Vertical swipe
             if dy > 0:
                 # Down swipe
-                self.code.input("D")
+                self.code.input("S")
                 # self.press_sound.stop()
                 # self.press_sound.play()
             else:
                 # Up swipe
-                self.code.input("U")
+                self.code.input("W")
                 # self.press_sound.stop()
                 # self.press_sound.play()
         
@@ -264,11 +334,11 @@ class Hellpad(QtWidgets.QWidget):
                 
             # Apply rotation based on direction
             transform = QtGui.QTransform()
-            if direction == "R":
+            if direction == "D":
                 transform.rotate(90)
-            elif direction == "D":
+            elif direction == "S":
                 transform.rotate(180)
-            elif direction == "L":
+            elif direction == "A":
                 transform.rotate(270)
             
             rotated_pixmap = pixmap.transformed(transform, QtCore.Qt.SmoothTransformation)
