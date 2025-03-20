@@ -186,13 +186,11 @@ class Hellpad(QtWidgets.QWidget):
             if dx > 0:
                 # Right swipe
                 self.code.input("R")
-                print("Right swipe")
                 # self.press_sound.stop()
                 # self.press_sound.play()
             else:
                 # Left swipe
                 self.code.input("L")
-                print("Left swipe")
                 # self.press_sound.stop()
                 # self.press_sound.play()
         else:
@@ -200,13 +198,11 @@ class Hellpad(QtWidgets.QWidget):
             if dy > 0:
                 # Down swipe
                 self.code.input("D")
-                print("Down swipe")
                 # self.press_sound.stop()
                 # self.press_sound.play()
             else:
                 # Up swipe
                 self.code.input("U")
-                print("Up swipe")
                 # self.press_sound.stop()
                 # self.press_sound.play()
         
