@@ -144,12 +144,15 @@ class SoundThread(QtCore.QThread):
         # Initialize sound effects
         self.press_sound = QtMultimedia.QSoundEffect()
         self.press_sound.setSource(QtCore.QUrl.fromLocalFile(os.path.join(current_dir, "audio/press.wav")))
+        self.press_sound.setVolume(1.0)
         
         self.success_sound = QtMultimedia.QSoundEffect()
         self.success_sound.setSource(QtCore.QUrl.fromLocalFile(os.path.join(current_dir, "audio/success.wav")))
+        self.success_sound.setVolume(1.0)
         
         self.fail_sound = QtMultimedia.QSoundEffect()
         self.fail_sound.setSource(QtCore.QUrl.fromLocalFile(os.path.join(current_dir, "audio/fail.wav")))
+        self.fail_sound.setVolume(1.0)
     
     def run(self):
         while not self.stopped:
