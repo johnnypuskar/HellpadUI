@@ -257,25 +257,25 @@ class Hellpad(QtWidgets.QWidget):
             if dx > 0:
                 # Right swipe
                 self.code.input("D")
-                # self.press_sound.stop()
-                # self.press_sound.play()
+                self.press_sound.stop()
+                self.press_sound.play()
             else:
                 # Left swipe
                 self.code.input("A")
-                # self.press_sound.stop()
-                # self.press_sound.play()
+                self.press_sound.stop()
+                self.press_sound.play()
         else:
             # Vertical swipe
             if dy > 0:
                 # Down swipe
                 self.code.input("S")
-                # self.press_sound.stop()
-                # self.press_sound.play()
+                self.press_sound.stop()
+                self.press_sound.play()
             else:
                 # Up swipe
                 self.code.input("W")
-                # self.press_sound.stop()
-                # self.press_sound.play()
+                self.press_sound.stop()
+                self.press_sound.play()
         
         result = CodeIndex.handle(self.code)
         self.setCodeDisplay(self.code.code, result)
