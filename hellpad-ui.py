@@ -287,10 +287,14 @@ class Hellpad(QtWidgets.QWidget):
     def printNextTextQueueChar(self):
         if self.code_name_text_queue == "":
             return
-        self.code_name.setText(self.code_name.text() + self.code_name_text_queue[0])
-        self.code_name_text_queue = self.code_name_text_queue[1:]
+        if " " in self.code_name_text_queue:
+            self.code_name.setText(self.code_name.text() + self.code_name_text_queue[0:self.code_name_text_queue.index(" ") + 1])
+            self.code_name_text_queue = self.code_name_text_queue[self.code_name_text_queue.index(" ")+1:]
+        else:
+            self.code_name.setText(self.code_name.text() + self.code_name_text_queue)
+            self.code_name_text_queue = ""
         if len(self.code_name_text_queue) > 0:
-            QtCore.QTimer.singleShot(15, self.printNextTextQueueChar)
+            QtCore.QTimer.singleShot(100, self.printNextTextQueueChar)
 
     def resetCode(self):
         self.code.reset()
