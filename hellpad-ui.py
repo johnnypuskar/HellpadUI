@@ -218,7 +218,7 @@ class Hellpad(QtWidgets.QWidget):
         self.code_name.setText(self.code_name.text() + self.code_name_text_queue[0])
         self.code_name_text_queue = self.code_name_text_queue[1:]
         if len(self.code_name_text_queue) > 0:
-            QtCore.QTimer.singleShot(20, self.printNextTextQueueChar)
+            QtCore.QTimer.singleShot(15, self.printNextTextQueueChar)
 
     def resetCode(self):
         self.code.reset()
