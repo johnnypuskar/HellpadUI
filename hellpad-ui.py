@@ -36,13 +36,13 @@ class CodeIndex:
         "SASWWA": "M-105 STALWART",
         "SSAWD": "EAT-17 EXPENDABLE ANTI-TANK",
         "SADDA": "GR-8 RECOILLESS RIFLE",
-        "SAWSA": "FLAM-40 FLAMETHROWER",
+        "SAWSW": "FLAM-40 FLAMETHROWER",
         "SASWWD": "AC-8 AUTOCANNON",
         "SAWSS": "MG-206 HEAVY MACHINE GUN",
         "SWWAD": "RL-77 AIRBURST ROCKET LAUNCHER",
         "SAWSD": "MLS-4X COMMANDO",
         "SDSWAD": "RS-422 RAILGUN",
-        "SSWSS": "FAF_14 SPEAR",
+        "SSWSS": "FAF-14 SPEAR",
         "SSWSD": "StA-X3 W.A.S.P. LAUNCHER",
         "DSAWW": "ORBITAL GATLING BARRAGE",
         "DDD": "ORBITAL AIRBURST STRIKE",
@@ -61,7 +61,7 @@ class CodeIndex:
         "WDWA": "EAGLE 110MM ROCKET PODS",
         "WDSSS": "EAGLE 500KG BOMB",
         "ASDSDSW": "M-102 FAST RECON VEHICLE",
-        "RRU": "ORBITAL PRECISION STRIKE",
+        "DDW": "ORBITAL PRECISION STRIKE",
         "DDSD": "ORBITAL GAS STRIKE",
         "DDAS": "ORBITAL EMS STRIKE",
         "DDSW": "ORBITAL SMOKE STRIKE",
@@ -73,9 +73,9 @@ class CodeIndex:
         "SAWAS": "GL-12 GRENADE LAUNCHER",
         "SASWA": "LAS-98 LASER CANNON",
         "SAAS": "MD-14 INCENDIARY MINES",
-        "SWASWDD": "AX/LAS-5 \"GUARD DOG\" ROVER",
+        "SWAWDD": "AX/LAS-5 \"GUARD DOG\" ROVER",
         "SASSWA": "SH-20 BALLISTIC SHIELD BACKPACK",
-        "SDSWWA": "ARC-3 ARC THROWER",
+        "SDSWAA": "ARC-3 ARC THROWER",
         "SAWW": "MD-17 ANTI-TANK MINES",
         "SSWAD": "LAS-99 QUASAR CANNON",
         "SWADAD": "SH-32 SHIELD GENERATOR PACK",
@@ -108,7 +108,7 @@ class CodeIndex:
         "DDAA": "ORBITAL ILLUMINATION FLARE",
         "DWWS": "SEAF ARTILLERY",
         "WADSWW": "DARK FLUID VESSEL",
-        "SWSWSW": "TECTONIC DRILL",
+        "WSWSWS": "TECTONIC DRILL",
         "AWSDSS": "HIVE BREAKER DRILL",
         "UUDDLRLR": quit
     }
@@ -285,6 +285,8 @@ class Hellpad(QtWidgets.QWidget):
         self.printNextTextQueueChar()
 
     def printNextTextQueueChar(self):
+        if self.code_name_text_queue == "":
+            return
         self.code_name.setText(self.code_name.text() + self.code_name_text_queue[0])
         self.code_name_text_queue = self.code_name_text_queue[1:]
         if len(self.code_name_text_queue) > 0:
@@ -306,6 +308,7 @@ class Hellpad(QtWidgets.QWidget):
             highlight = True
             self.printText(name)
         else:
+            self.code_name_text_queue = ""
             self.code_name.setText("")
 
         arrow_size = self.arrow_size
