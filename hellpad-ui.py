@@ -131,6 +131,57 @@ class CodeIndex:
         QtWidgets.QApplication.quit()
         return "QUIT PROGRAM"
 
+class SoundThread(QtCore.QThread):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.mutex = QtCore.QMutex()
+        self.condition = QtCore.QWaitCondition()
+        self.stopped = False
+        self.sound_to_play = None
+        
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        
+        # Initialize sound effects
+        self.press_sound = QtMultimedia.QSoundEffect()
+        self.press_sound.setSource(QtCore.QUrl.fromLocalFile(os.path.join(current_dir, "audio/press.wav")))
+        
+        self.success_sound = QtMultimedia.QSoundEffect()
+        self.success_sound.setSource(QtCore.QUrl.fromLocalFile(os.path.join(current_dir, "audio/success.wav")))
+        
+        self.fail_sound = QtMultimedia.QSoundEffect()
+        self.fail_sound.setSource(QtCore.QUrl.fromLocalFile(os.path.join(current_dir, "audio/fail.wav")))
+    
+    def run(self):
+        while not self.stopped:
+            self.mutex.lock()
+            if self.sound_to_play is None:
+                self.condition.wait(self.mutex)
+            
+            sound = self.sound_to_play
+            self.sound_to_play = None
+            self.mutex.unlock()
+            
+            if sound == "press":
+                self.press_sound.stop()
+                self.press_sound.play()
+            elif sound == "success":
+                self.success_sound.stop()
+                self.success_sound.play()
+            elif sound == "fail":
+                self.fail_sound.stop()
+                self.fail_sound.play()
+    
+    def play_sound(self, sound_name):
+        self.mutex.lock()
+        self.sound_to_play = sound_name
+        self.condition.wakeOne()
+        self.mutex.unlock()
+    
+    def stop(self):
+        self.mutex.lock()
+        self.stopped = True
+        self.condition.wakeOne()
+        self.mutex.unlock()
 
 class Hellpad(QtWidgets.QWidget):
     def __init__(self):
@@ -153,14 +204,8 @@ class Hellpad(QtWidgets.QWidget):
 
         self.code = Code()
 
-        self.press_sound = QtMultimedia.QSoundEffect()
-        self.press_sound.setSource(QtCore.QUrl.fromLocalFile(os.path.join(current_dir, "audio/press.wav")))
-
-        self.success_sound = QtMultimedia.QSoundEffect()
-        self.success_sound.setSource(QtCore.QUrl.fromLocalFile(os.path.join(current_dir, "audio/success.wav")))
-
-        self.fail_sound = QtMultimedia.QSoundEffect()
-        self.fail_sound.setSource(QtCore.QUrl.fromLocalFile(os.path.join(current_dir, "audio/fail.wav")))
+        self.sound = SoundThread()
+        self.sound.start()
 
         self.container = QtWidgets.QFrame(self)
         self.container.setFixedSize(480, 320)
@@ -196,7 +241,7 @@ class Hellpad(QtWidgets.QWidget):
         )
         self.reset_button.setFocusPolicy(QtCore.Qt.NoFocus)
         self.reset_button.setObjectName("ResetButton")
-        self.reset_button.clicked.connect(self.resetCode)
+        self.reset_button.clicked.connect(self.resetButton)
     
 
         bg_path = os.path.join(current_dir, "hellpad-background.png").replace("\\", "/")
@@ -257,27 +302,23 @@ class Hellpad(QtWidgets.QWidget):
             if dx > 0:
                 # Right swipe
                 self.code.input("D")
-                self.press_sound.stop()
-                self.press_sound.play()
             else:
                 # Left swipe
                 self.code.input("A")
-                self.press_sound.stop()
-                self.press_sound.play()
         else:
             # Vertical swipe
             if dy > 0:
                 # Down swipe
                 self.code.input("S")
-                self.press_sound.stop()
-                self.press_sound.play()
             else:
                 # Up swipe
                 self.code.input("W")
-                self.press_sound.stop()
-                self.press_sound.play()
         
         result = CodeIndex.handle(self.code)
+        if result is not None:
+            self.sound.play_sound("success")
+        else:
+            self.sound.play_sound("press")
         self.setCodeDisplay(self.code.code, result)
     
     def printText(self, text = ""):
@@ -295,6 +336,10 @@ class Hellpad(QtWidgets.QWidget):
             self.code_name_text_queue = ""
         if len(self.code_name_text_queue) > 0:
             QtCore.QTimer.singleShot(100, self.printNextTextQueueChar)
+
+    def resetButton(self):
+        self.sound.play_sound("fail")
+        self.resetCode()
 
     def resetCode(self):
         self.code.reset()
