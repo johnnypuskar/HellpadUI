@@ -110,7 +110,7 @@ class CodeIndex:
         "WADSWW": "DARK FLUID VESSEL",
         "WSWSWS": "TECTONIC DRILL",
         "AWSDSS": "HIVE BREAKER DRILL",
-        "UUDDLRLR": quit
+        "WWSSADAD": quit
     }
     
     @staticmethod
