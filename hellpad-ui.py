@@ -14,6 +14,8 @@ if sys.platform == 'linux':
 else:
     IS_RASPBERRY_PI = False
 
+MASTER_VOLUME = 1.0
+
 class Code:
     def __init__(self):
         self.code = ""
@@ -110,15 +112,19 @@ class CodeIndex:
         "WADSWW": "DARK FLUID VESSEL",
         "WSWSWS": "TECTONIC DRILL",
         "AWSDSS": "HIVE BREAKER DRILL",
+        "AADSS": lambda hellpad: CodeIndex.play_music("drop-theme", "DROP THEME", hellpad),
+        "AADWD": lambda hellpad: CodeIndex.play_music("super-earth-anthem", "SUPER EARTH ANTHEM", hellpad),
+        "AADAD": lambda hellpad: CodeIndex.play_music("caramelldansen", "CARAMELLDANSEN", hellpad),
+        "AADWW": lambda hellpad: CodeIndex.play_music("extraction", "EXTRACTION THEME", hellpad),
         "WWSSADAD": quit
     }
     
     @staticmethod
-    def handle(code_obj):
+    def handle(code_obj, hellpad):
         if CodeIndex.is_valid(code_obj.code):
             value = CodeIndex.INDEX[code_obj.code]
             if callable(value):
-                return value()
+                return value(hellpad)
             return value
         return None
     
@@ -127,7 +133,17 @@ class CodeIndex:
         return code in CodeIndex.INDEX
 
     @staticmethod
-    def quit():
+    def play_music(music_name, return_name, hellpad):
+        if hellpad.music.isPlaying():
+            hellpad.music.stop()
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        music_path = os.path.join(current_dir, f"audio/music/{music_name}.wav")
+        hellpad.music.setSource(QtCore.QUrl.fromLocalFile(music_path))
+        hellpad.music.play()
+        return "PLAY " + return_name
+        
+    @staticmethod
+    def quit(hellpad = None):
         QtWidgets.QApplication.quit()
         return "QUIT PROGRAM"
 
@@ -159,17 +175,22 @@ class Hellpad(QtWidgets.QWidget):
         # Sound setup
         self.press_sound = QtMultimedia.QSoundEffect()
         self.press_sound.setSource(QtCore.QUrl.fromLocalFile(os.path.join(current_dir, "audio/press.wav")))
-        self.press_sound.setVolume(1.0)
+        self.press_sound.setVolume(MASTER_VOLUME)
         
         self.success_sound = QtMultimedia.QSoundEffect()
         self.success_sound.setSource(QtCore.QUrl.fromLocalFile(os.path.join(current_dir, "audio/success.wav")))
-        self.success_sound.setVolume(1.0)
+        self.success_sound.setVolume(MASTER_VOLUME)
         
         self.fail_sound = QtMultimedia.QSoundEffect()
         self.fail_sound.setSource(QtCore.QUrl.fromLocalFile(os.path.join(current_dir, "audio/fail.wav")))
-        self.fail_sound.setVolume(1.0)
+        self.fail_sound.setVolume(MASTER_VOLUME)
 
-        
+        # Music setup
+        self.music = QtMultimedia.QMediaPlayer()
+        self.music_output = QtMultimedia.QAudioOutput()
+        self.music.setAudioOutput(self.music_output)
+        self.music_output.setVolume(MASTER_VOLUME)
+
         self.arrow_image = QtGui.QPixmap(os.path.join(current_dir, "arrow.png"))
         self.arrow_image_highlighted = QtGui.QPixmap(os.path.join(current_dir, "arrow-highlighted.png"))
         self.arrow_size = QtCore.QSize(50, 50)  # Define size for arrows
@@ -283,7 +304,7 @@ class Hellpad(QtWidgets.QWidget):
                 # Up swipe
                 self.code.input("W")
         
-        result = CodeIndex.handle(self.code)
+        result = CodeIndex.handle(self.code, self)
         if result is not None:
             self.playSound("success")
         else:
@@ -308,6 +329,8 @@ class Hellpad(QtWidgets.QWidget):
 
     def resetButton(self):
         self.playSound("fail")
+        if self.music.isPlaying():
+            self.music.stop()
         self.resetCode()
 
     def resetCode(self):
