@@ -97,6 +97,7 @@ class CodeIndex:
         "SWADDD": "E/AT-12 ANTI-TANK EMPLACEMENT",
         "SWDSWW": "A/FLAM-40 FLAME SENTRY",
         "SDWWW": "B-100 PORTABLE HELLBOMB",
+        "SWWSAD": "LIFT-860 HOVER PACK",
         "WSDAW": "REINFORCE",
         "WSDW": "SOS BEACON",
         "SSWD": "RESUPPLY",
