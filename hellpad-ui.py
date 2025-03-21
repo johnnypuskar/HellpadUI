@@ -191,18 +191,6 @@ class Hellpad(QtWidgets.QWidget):
         self.music.setAudioOutput(self.music_output)
         self.music_output.setVolume(MASTER_VOLUME)
 
-        # Screen sleep setup
-        self.screen_blocker = QtWidgets.QFrame(self)
-        self.screen_blocker.setFixedSize(480, 320)
-        self.screen_blocker.setObjectName("SleepScreen")
-        self.screen_blocker.setVisible(False)
-        
-        self.SLEEP_TIME = 15
-        self.sleep_timer = QtCore.QTimer()
-        self.sleep_timer.timeout.connect(lambda: self.screen_blocker.setVisible(True))
-        self.sleep_timer.setSingleShot(True)
-        self.sleep_timer.start(self.SLEEP_TIME * 1000)
-
         # Arrows setup
 
         self.arrow_image = QtGui.QPixmap(os.path.join(current_dir, "arrow.png"))
@@ -236,17 +224,12 @@ class Hellpad(QtWidgets.QWidget):
         self.reset_button.setObjectName("ResetButton")
         self.reset_button.clicked.connect(self.resetButton)
     
-    
-
         bg_path = os.path.join(current_dir, "hellpad-background.png").replace("\\", "/")
         self.setObjectName("Hellpad")
         self.setStyleSheet(f"""
             #Hellpad {{
                 background-image: url("{bg_path}");
                 padding: 85 54 14 54;
-            }}
-            #SleepScreen {{
-                background-color: rgba(0, 0, 0, 0.9);
             }}
             #CodeDisplay {{
                 color: #FFFFFF;
@@ -272,16 +255,7 @@ class Hellpad(QtWidgets.QWidget):
         """)
         self.setFocusProxy(None)
 
-    def resetSleepTimer(self):
-        self.sleep_timer.start(self.SLEEP_TIME * 1000)
-        if self.screen_blocker.isVisible():
-            self.screen_blocker.setVisible(False)
-            return True
-        return False
-
     def mousePressEvent(self, event):
-        if self.resetSleepTimer():
-            return super().mousePressEvent(event)
         if CodeIndex.is_valid(self.code.code):
             self.resetCode()
         else:
@@ -355,8 +329,6 @@ class Hellpad(QtWidgets.QWidget):
             QtCore.QTimer.singleShot(100, self.printNextTextQueueChar)
 
     def resetButton(self):
-        if self.resetSleepTimer():
-            return
         self.playSound("fail")
         if self.music.isPlaying():
             self.music.stop()
